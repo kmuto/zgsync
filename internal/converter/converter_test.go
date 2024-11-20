@@ -35,7 +35,7 @@ func TestConvertToHTML_Div(t *testing.T) {
 	c := NewConverter()
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			actualHTMLContent, _ := c.ConvertToHTML(tc.markdown)
+			actualHTMLContent, _ := c.ConvertToHTML(false, tc.markdown)
 			if strings.Compare(tc.expected, actualHTMLContent) != 0 {
 				t.Errorf("expected %s, got %s", tc.expected, actualHTMLContent)
 			}
@@ -89,7 +89,65 @@ func TestConvertToHTML_Headings(t *testing.T) {
 	c := NewConverter()
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			actualHTMLContent, _ := c.ConvertToHTML(tc.markdown)
+			actualHTMLContent, _ := c.ConvertToHTML(false, tc.markdown)
+			if strings.Compare(tc.expected, actualHTMLContent) != 0 {
+				t.Errorf("expected %s, got %s", tc.expected, actualHTMLContent)
+			}
+		})
+	}
+}
+
+func TestConvertToHTML_Pre(t *testing.T) {
+	testCases := []struct {
+		name     string
+		markdown string
+		expected string
+	}{
+		{
+			name:     "simple code block",
+			markdown: "```\nthis is a test content\n```\n",
+			expected: "<pre><code>this is a test content\n</code></pre>\n",
+		},
+		{
+			name:     "code block with language",
+			markdown: "```ruby\nthis is a test content\n```\n",
+			expected: "<pre><code class=\"language-ruby\">this is a test content\n</code></pre>\n",
+		},
+	}
+
+	c := NewConverter()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actualHTMLContent, _ := c.ConvertToHTML(false, tc.markdown)
+			if strings.Compare(tc.expected, actualHTMLContent) != 0 {
+				t.Errorf("expected %s, got %s", tc.expected, actualHTMLContent)
+			}
+		})
+	}
+}
+
+func TestConvertToHTML_SimplifyPre(t *testing.T) {
+	testCases := []struct {
+		name     string
+		markdown string
+		expected string
+	}{
+		{
+			name:     "simple code block and simplify",
+			markdown: "```\nthis is a test content\n```\n",
+			expected: "<pre>this is a test content\n</pre>\n",
+		},
+		{
+			name:     "code block with language and simplify",
+			markdown: "```ruby\nthis is a test content\n```\n",
+			expected: "<pre>this is a test content\n</pre>\n",
+		},
+	}
+
+	c := NewConverter()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actualHTMLContent, _ := c.ConvertToHTML(true, tc.markdown)
 			if strings.Compare(tc.expected, actualHTMLContent) != 0 {
 				t.Errorf("expected %s, got %s", tc.expected, actualHTMLContent)
 			}

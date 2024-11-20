@@ -2,6 +2,7 @@ package converter
 
 import (
 	"bytes"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -18,7 +19,7 @@ import (
 )
 
 type Converter interface {
-	ConvertToHTML(markdown string) (string, error)
+	ConvertToHTML(SimplifyPreCode bool, markdown string) (string, error)
 	ConvertToMarkdown(html string) (string, error)
 }
 
@@ -57,10 +58,15 @@ func NewConverter() Converter {
 	return &converterImpl{markdown, html}
 }
 
-func (c *converterImpl) ConvertToHTML(markdown string) (string, error) {
+func (c *converterImpl) ConvertToHTML(SimplifyPreCode bool, markdown string) (string, error) {
 	var buf bytes.Buffer
 	err := c.markdown.Convert([]byte(markdown), &buf)
-	return buf.String(), err
+	s := buf.String()
+	if SimplifyPreCode {
+		re := regexp.MustCompile(`(?s)<pre><code.*?>(.*?)</code></pre>`)
+		s = re.ReplaceAllString(s, "<pre>$1</pre>")
+	}
+	return s, err
 }
 
 func (c *converterImpl) ConvertToMarkdown(html string) (string, error) {

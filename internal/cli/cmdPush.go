@@ -91,7 +91,7 @@ func (c *CommandPush) pushTranslation(g *Global, file string) error {
 	}
 
 	if !c.Raw {
-		if t.Body, err = c.converter.ConvertToHTML(t.Body); err != nil {
+		if t.Body, err = c.converter.ConvertToHTML(g.Config.SimplifyPreCode, t.Body); err != nil {
 			return err
 		}
 	}
