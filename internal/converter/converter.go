@@ -63,7 +63,7 @@ func (c *converterImpl) ConvertToHTML(SimplifyPreCode bool, markdown string) (st
 	err := c.markdown.Convert([]byte(markdown), &buf)
 	s := buf.String()
 	if SimplifyPreCode {
-		re := regexp.MustCompile(`(?s)<pre><code.*?>(.*?)</code></pre>`)
+		re := regexp.MustCompile(`(?s)<pre>\n?<code.*?>(.*?)</code></pre>`)
 		s = re.ReplaceAllString(s, "<pre>$1</pre>")
 	}
 	return s, err
